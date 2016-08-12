@@ -248,6 +248,17 @@ class TestAptSources(testcommon.TestCase):
         for key in found:
             self.assertEqual(found[key], 1)
 
+    def test_os_release_distribution(self):
+        """os-release file can be read and is_like is populated accordingly"""
+        aptsources.distro._OSRelease.OS_RELEASE_FILE = os.path.abspath("./data/aptsources/os-release")
+        distro = aptsources.distro.get_distro()
+        self.assertEqual('neon', distro.id)
+        self.assertEqual('xenial', distro.codename)
+        self.assertEqual('KDE neon User Edition on 16.04 LTS', distro.description)
+        self.assertEqual('16.04', distro.release)
+        self.assertEqual(['ubuntu', 'debian'], distro.is_like)
+        aptsources.distro._OSRelease.OS_RELEASE_FILE = aptsources.distro._OSRelease.DEFAULT_OS_RELEASE_FILE
+
     def test_enable_disabled(self):
         """LP: #1042916: Test enabling disabled entry."""
         apt_pkg.config.set("Dir::Etc::sourcelist", "data/aptsources/"
